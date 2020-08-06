@@ -2,6 +2,9 @@ var socket = io();
 
 var params = new URLSearchParams(window.location.search);
 
+// jQuery references
+var divUsers = $('#divUsers');
+
 if (!params.has('name') || !params.has('room')) {
     window.location = 'index.html';
     throw new Error('El nombre y sala de chat son necesarios');
@@ -16,7 +19,8 @@ var user = {
 socket.on('connect', function() {
     console.log('Conectado al servidor');
     socket.emit('enterChat', user, function(resp) {
-        console.log('Usuarios conectados', resp);
+        // console.log('Usuarios conectados', resp);
+        renderUsers(resp);
     });
 });
 
@@ -26,16 +30,19 @@ socket.on('disconnect', function() {
 });
 
 // Listen info
-socket.on('createMessage', function(mensaje) {
-    console.log('Servidor: ', mensaje);
+socket.on('createMessage', function(message) {
+    // console.log('Servidor: ', message);
+    renderMessages(message, false);
+    scrollBottom();
 });
 
 // Listen user's change (connect or disconnect)
 socket.on('listUsers', function(users) {
-    console.log(users);
+    // console.log(users);
+    renderUsers(users);
 });
 
 // Private messages
 socket.on('privateMessage', function(message) {
     console.log('Mensaje privado: ', message);
-})
+});
